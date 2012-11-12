@@ -47,6 +47,8 @@ class YoudaoMain:
         text = self.queryObj.getBrief(self.entry.get_text())
         self.buffer.set_text(text)
 
+        self.detailButton.set_label('More')
+
         
     def windowLoseFocus(self, *args):
         self.textview.hide()
@@ -88,11 +90,12 @@ class YoudaoMain:
 if __name__ == "__main__":
     configFile = open('config','r')
     configs = configFile.read()
-    
-    api_key = configs.split('\n')[0].split('=')[1].strip()
-    key_from = configs.split('\n')[1].split('=')[1].strip()
-    base = YoudaoMain(api_key, key_from)
-    base.main()
-    # except:
-    #     print 'Wrong configuration file. Abort'
-    #     exit()
+
+    try:
+        api_key = configs.split('\n')[0].split('=')[1].strip()
+        key_from = configs.split('\n')[1].split('=')[1].strip()
+        base = YoudaoMain(api_key, key_from)
+        base.main()
+    except:
+        print 'Wrong configuration file. Abort'
+        exit()
