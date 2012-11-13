@@ -18,12 +18,14 @@ class YoudaoMain:
         self.buffer = self.textview.get_buffer()
         self.detailButton = gtk.Button('More')
         self.buttonBox = gtk.VBox()
+        self.textviewScroller = gtk.ScrolledWindow()
         
         self.window.set_default_size(220,1)
         self.window.set_keep_above(True)
         self.window.set_title('有道迷你词典')
         self.textview.set_editable(False)
         self.textview.set_wrap_mode(gtk.WRAP_WORD_CHAR)
+        self.textviewScroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
         self.entry.connect('activate', self.lookupWord)
         self.window.connect('focus-in-event', self.windowFocus)
@@ -31,10 +33,15 @@ class YoudaoMain:
         self.window.connect('delete_event', self.delete_event)
         self.window.connect('destroy', self.destroy)
         self.detailButton.connect('clicked', self.mlDetail)
+
+        self.detailButton.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#2E64FE'))
+        self.textviewScroller.set_border_width(8)
+        self.textviewScroller.set_usize(220,266)
         
         self.hbox.add(self.entry)
         self.vbox.add(self.hbox)
-        self.vbox.add(self.textview)
+        self.textviewScroller.add_with_viewport(self.textview)
+        self.vbox.add(self.textviewScroller)
         self.buttonBox.add(self.detailButton)
         self.vbox.add(self.buttonBox)
         self.window.add(self.vbox)
@@ -42,8 +49,7 @@ class YoudaoMain:
 
         
     def lookupWord(self, *args):
-        self.window.resize(220,1)
-        self.textview.show()
+        self.textviewScroller.show()
         text = self.queryObj.getBrief(self.entry.get_text())
         self.buffer.set_text(text)
 
@@ -51,18 +57,22 @@ class YoudaoMain:
 
         
     def windowLoseFocus(self, *args):
-        self.textview.hide()
+        self.textviewScroller.hide()
         self.buttonBox.hide()
-        self.window.resize(220,1)
+        self.window.resize(self.window.get_size()[0],1)
 
         
     def windowFocus(self, *args):
-        self.textview.show()
+        self.textviewScroller.show()
         self.buttonBox.show()
+        self.textviewScroller.set_usize(220,266)
         self.entry.select_region(0, len(self.entry.get_text()))
 
         
     def mlDetail(self, widget, data=None):
+        if self.entry.get_text() == '':
+            return 0
+        
         if self.detailButton.get_label() == 'More':
             bounds = self.buffer.get_bounds()
             word = self.entry.get_text()
@@ -88,14 +98,18 @@ class YoudaoMain:
 
         
 if __name__ == "__main__":
-    configFile = open('config','r')
-    configs = configFile.read()
-
     try:
+        configFile = open('config','r')
+        configs = configFile.read()
+
         api_key = configs.split('\n')[0].split('=')[1].strip()
         key_from = configs.split('\n')[1].split('=')[1].strip()
+
         base = YoudaoMain(api_key, key_from)
         base.main()
-    except:
+    except IOError as ioerror:
+        print ioerror
+        exit()
+    except IndexError:
         print 'Wrong configuration file. Abort'
         exit()
