@@ -17,7 +17,6 @@ class YoudaoMain:
         self.textview = gtk.TextView()
         self.buffer = self.textview.get_buffer()
         self.detailButton = gtk.Button('More')
-        self.buttonBox = gtk.VBox()
         self.textviewScroller = gtk.ScrolledWindow()
         
         self.window.set_default_size(220,1)
@@ -38,12 +37,11 @@ class YoudaoMain:
         self.textviewScroller.set_border_width(8)
         self.textviewScroller.set_usize(220,266)
         
-        self.hbox.add(self.entry)
-        self.vbox.add(self.hbox)
+        self.hbox.pack_start(self.entry)
+        self.vbox.pack_start(self.hbox, False)
         self.textviewScroller.add_with_viewport(self.textview)
-        self.vbox.add(self.textviewScroller)
-        self.buttonBox.add(self.detailButton)
-        self.vbox.add(self.buttonBox)
+        self.vbox.pack_start(self.textviewScroller)
+        self.vbox.pack_start(self.detailButton, False)
         self.window.add(self.vbox)
         self.window.show_all()
 
@@ -58,13 +56,12 @@ class YoudaoMain:
         
     def windowLoseFocus(self, *args):
         self.textviewScroller.hide()
-        self.buttonBox.hide()
+        self.detailButton.hide()
         self.window.resize(self.window.get_size()[0],1)
 
         
     def windowFocus(self, *args):
-        self.textviewScroller.show()
-        self.buttonBox.show()
+        self.vbox.show_all()
         self.textviewScroller.set_usize(220,266)
         self.entry.select_region(0, len(self.entry.get_text()))
 
