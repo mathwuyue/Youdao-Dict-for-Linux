@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from urllib2 import urlopen
+from urllib2 import urlopen, quote
 import json
 
 class QueryYoudao:
@@ -13,14 +13,16 @@ class QueryYoudao:
     def query(self, word):
         word = word.strip().split()
         if len(word) > 1:
+            for i,w in enumerate(word):
+                word[i] = quote(word[i])
             word = '+'.join(word)
         else:
-            word = word[0]
-            
+            word = quote(word[0])
+
         if self.resultsCache.has_key(word):
             results = self.resultsCache[word]
         else:
-            req = urlopen('http://fanyi.youdao.com/openapi.do?keyfrom=%s&key=%s&type=data&doctype=json&version=1.1&q=%s' % (self.key_from, self.api_key, word))
+            req = urlopen('http://fanyi.youdao.com/openapi.do?keyfrom=%s&key=%s&type=data&doctype=json&version=1.1&q=%s'%(self.key_from, self.api_key, word))
             results = json.loads(req.read())
             self.resultsCache[word] = results
 
