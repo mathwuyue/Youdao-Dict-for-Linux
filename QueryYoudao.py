@@ -35,7 +35,7 @@ class QueryYoudao:
         return False
 
         
-    def getBrief(self, word, queue, buffer):
+    def getBrief(self, word, buffer):
         results = self.query(word)
         
         text = '未找到匹配的词'

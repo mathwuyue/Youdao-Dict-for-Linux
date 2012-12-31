@@ -7,7 +7,7 @@ import threading
 from QueryYoudao import QueryYoudao
 
 class YoudaoMain:
-    def __init__(self, api_key, key_from, queue):
+    def __init__(self, api_key, key_from):
         self.queue = queue
         self.api_key = api_key
         self.key_from = key_from
@@ -51,7 +51,7 @@ class YoudaoMain:
         
     def lookupWord(self, *args):
         self.textviewScroller.show()
-        q_thread = threading.Thread(target=self.queryObj.getBrief, args=(self.entry.get_text(), self.queue, self.buffer))
+        q_thread = threading.Thread(target=self.queryObj.getBrief, args=(self.entry.get_text(), self.buffer))
         q_thread.start()
 
         self.detailButton.set_label('More')
@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
         gobject.threads_init()
 
-        base = YoudaoMain(api_key, key_from, queue)
+        base = YoudaoMain(api_key, key_from)
         base.main()
     except IOError as ioerror:
         print ioerror
