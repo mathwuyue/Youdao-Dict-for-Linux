@@ -2,10 +2,13 @@
 # coding=utf-8
 
 import gtk
+import gobject
+import threading
 from QueryYoudao import QueryYoudao
 
 class YoudaoMain:
-    def __init__(self, api_key, key_from):
+    def __init__(self, api_key, key_from, queue):
+        self.queue = queue
         self.api_key = api_key
         self.key_from = key_from
         self.queryObj = QueryYoudao(api_key, key_from)
@@ -48,8 +51,8 @@ class YoudaoMain:
         
     def lookupWord(self, *args):
         self.textviewScroller.show()
-        text = self.queryObj.getBrief(self.entry.get_text())
-        self.buffer.set_text(text)
+        q_thread = threading.Thread(target=self.queryObj.getBrief, args=(self.entry.get_text(), self.queue, self.buffer))
+        q_thread.start()
 
         self.detailButton.set_label('More')
 
@@ -102,7 +105,9 @@ if __name__ == "__main__":
         api_key = configs.split('\n')[0].split('=')[1].strip()
         key_from = configs.split('\n')[1].split('=')[1].strip()
 
-        base = YoudaoMain(api_key, key_from)
+        gobject.threads_init()
+
+        base = YoudaoMain(api_key, key_from, queue)
         base.main()
     except IOError as ioerror:
         print ioerror

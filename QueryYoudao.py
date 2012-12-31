@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from urllib2 import urlopen, quote
 import json
+import gobject
 
 class QueryYoudao:
     def __init__(self, api_key, key_from):
@@ -28,8 +29,13 @@ class QueryYoudao:
 
         return results
 
+    
+    def update_buffer(self, buffer, text):
+        buffer.set_text(text)
+        return False
+
         
-    def getBrief(self, word):
+    def getBrief(self, word, queue, buffer):
         results = self.query(word)
         
         text = '未找到匹配的词'
@@ -38,7 +44,8 @@ class QueryYoudao:
             basic = results['basic']
             text = word + '\n'
         else:
-            return text;
+            gobject.idle_add(self.update_buffer, buffer, text)
+            return
             
         if basic.has_key('phonetic'):
             phonetic = basic['phonetic']
@@ -53,8 +60,8 @@ class QueryYoudao:
                 text = text + explains + '\n'
         else:
             explains = None
-                        
-        return text
+
+        gobject.idle_add(self.update_buffer, buffer, text)
 
     
     def getDetail(self, word):
