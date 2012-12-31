@@ -8,7 +8,6 @@ from QueryYoudao import QueryYoudao
 
 class YoudaoMain:
     def __init__(self, api_key, key_from):
-        self.queue = queue
         self.api_key = api_key
         self.key_from = key_from
         self.queryObj = QueryYoudao(api_key, key_from)
